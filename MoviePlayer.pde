@@ -36,6 +36,24 @@ class MoviePlayer {
     frame = createImage(movie.width, movie.height, RGB);
   }
   
+  void frameForward() {
+    movie.pause();
+    movie.jump(movie.time() + (1.0/movie.frameRate));
+    refreshFrame();
+  }
+  
+  void frameBack() {
+    movie.pause();
+    movie.jump(movie.time() - (1.0/movie.frameRate));
+    refreshFrame();
+  }
+  
+  void refreshFrame() {
+    movie.read();
+    if (lowerRight.x == 0 && lowerRight.y == 0) lowerRight = new PVector(movie.width, movie.height);
+    frame = movie.get((int) upperLeft.x, (int) upperLeft.y, (int) lowerRight.x, (int) lowerRight.y); 
+  }
+  
 }
 
 void setupMoviePlayer(String fileName) {

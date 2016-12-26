@@ -54,7 +54,7 @@ void draw() {
 }
 
 void keyPressed() {
-  debug = !debug;
+  if (key=='d') debug = !debug;
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
