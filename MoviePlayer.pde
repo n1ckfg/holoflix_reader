@@ -9,9 +9,28 @@ class MoviePlayer {
   boolean firstRun = true;
   boolean ready = false;
   boolean resizeStage = false;
+  PVector pos = new PVector(0,0);
+  PVector scale = new PVector(0,0);
+  PVector upperLeft = new PVector(0,0);
+  PVector lowerRight = new PVector(0,0);
   
   MoviePlayer(String fileName, PApplet pApplet) {
     movie = new Movie(pApplet, fileName);
+    /*
+    frameRate()  Sets the target frame rate
+    speed()  Sets the relative playback speed
+    duration()  Returns length of movie in seconds
+    time()  Returns location of playback head in units of seconds
+    jump()  Jumps to a specific location
+    available()  Returns "true" when a new movie frame is available to read.
+    play()  Plays movie one time and stops at the last frame
+    loop()  Plays a movie continuously, restarting it when it's over.
+    noLoop()  Stops the movie from looping
+    pause()  Pauses the movie
+    stop()  Stops the movie
+    read()  Reads the current frame
+    volume() Sets the volume
+    */
     movie.loop();
     movie.volume(0);
     frame = createImage(movie.width, movie.height, RGB);
@@ -42,7 +61,11 @@ void drawMoviePlayer() {
       moviePlayer[i].ready = false;
     }
     if (moviePlayer[i].movie.available()) {
-      image(moviePlayer[i].frame, 0, 0);
+      if (moviePlayer[i].scale.x == 0  && moviePlayer[i].scale.y == 0) {
+        image(moviePlayer[i].frame, moviePlayer[i].pos.x, moviePlayer[i].pos.y);
+      } else {
+        image(moviePlayer[i].frame, moviePlayer[i].pos.x, moviePlayer[i].pos.y, moviePlayer[i].scale.x, moviePlayer[i].scale.y);
+      }
     }  
   }
 }
@@ -56,7 +79,8 @@ void movieEvent(Movie m) {
           moviePlayer[i].ready = true;
           moviePlayer[i].firstRun = false;
         }
-        moviePlayer[i].frame = moviePlayer[i].movie.get(0, 0, m.width, m.height); 
+        if (moviePlayer[i].lowerRight.x == 0 && moviePlayer[i].lowerRight.y == 0) moviePlayer[i].lowerRight = new PVector(m.width, m.height);
+        moviePlayer[i].frame = moviePlayer[i].movie.get((int) moviePlayer[i].upperLeft.x, (int) moviePlayer[i].upperLeft.y, (int) moviePlayer[i].lowerRight.x, (int) moviePlayer[i].lowerRight.y); 
       } 
     }
   }
