@@ -17,8 +17,8 @@ void setup() {
 void draw() {
     background(0);
     
-    rgbImg = moviePlayer[0].frame.get(640, 120, 1280, 600);
-    depthImg = processDepthMap(moviePlayer[0].frame.get(0, 120, 640, 600));
+    rgbImg = moviePlayer[0].movie.get(640, 120, 1280, 600);
+    depthImg = processDepthMap(moviePlayer[0].movie.get(0, 120, 640, 600));
     
     rgbGfx.beginDraw();
     rgbGfx.image(rgbImg, 0, 0);

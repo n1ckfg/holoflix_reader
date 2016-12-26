@@ -89,17 +89,15 @@ void drawMoviePlayer() {
 }
 
 void movieEvent(Movie m) {
+  m.read();
   for (int i=0; i<moviePlayer.length; i++) {
-    if (m == moviePlayer[i].movie) { // modify for multiple movies
-      moviePlayer[i].movie.read();
-      if (moviePlayer[i].movie.available()) {
-        if (moviePlayer[i].firstRun) {
-          moviePlayer[i].ready = true;
-          moviePlayer[i].firstRun = false;
-        }
-        if (moviePlayer[i].lowerRight.x == 0 && moviePlayer[i].lowerRight.y == 0) moviePlayer[i].lowerRight = new PVector(m.width, m.height);
-        moviePlayer[i].frame = moviePlayer[i].movie.get((int) moviePlayer[i].upperLeft.x, (int) moviePlayer[i].upperLeft.y, (int) moviePlayer[i].lowerRight.x, (int) moviePlayer[i].lowerRight.y); 
-      } 
-    }
+    if (moviePlayer[i].movie.available()) {
+      if (moviePlayer[i].firstRun) {
+        moviePlayer[i].ready = true;
+        moviePlayer[i].firstRun = false;
+      }
+      if (moviePlayer[i].lowerRight.x == 0 && moviePlayer[i].lowerRight.y == 0) moviePlayer[i].lowerRight = new PVector(moviePlayer[i].movie.width, moviePlayer[i].movie.height);
+      moviePlayer[i].frame = moviePlayer[i].movie.get((int) moviePlayer[i].upperLeft.x, (int) moviePlayer[i].upperLeft.y, (int) moviePlayer[i].lowerRight.x, (int) moviePlayer[i].lowerRight.y); 
+    } 
   }
 }
