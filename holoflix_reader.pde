@@ -1,63 +1,112 @@
 PImage depthImg, rgbImg;
+PGraphics depthBuffer, rgbBuffer; 
 PGraphics depthGfx, rgbGfx;
 boolean debug = false;
+boolean ruttetra = true;
 
 void setup() {
   size(512, 848, P2D);
-  setupMoviePlayer("IHBH2323.MOV");
+  setupMoviePlayer("12876458_568439199999797_1099287423_n.mp4");//"IHBH2323.MOV");
   depthImg = createImage(640, 480, RGB);
+  depthBuffer = createGraphics(640, 480, P2D);
+  rgbBuffer = createGraphics(640, 480, P2D);
   rgbImg = createImage(640, 480, RGB);
   depthGfx = createGraphics(512, 424, P2D);
   rgbGfx = createGraphics(512, 424, P2D);
-  imageMode(CENTER);
-  rectMode(CENTER);
-  noStroke();
+  
+  setupSyphon();
+  setupShaders();
+  
+  tex.imageMode(CENTER);
+  tex.rectMode(CENTER);
+  tex.noStroke();
 }
 
 void draw() {
-    background(0);
+  background(0);
+  
+  
+  if (ruttetra) {
+    rgbImg = moviePlayer[0].movie.get();
     
+    rgbBuffer.beginDraw();
+    rgbBuffer.image(rgbImg, 0, 0, 640, 480);
+    rgbBuffer.endDraw();
+    
+    depthBuffer.beginDraw();
+    depthBuffer.image(rgbImg, 0, 0, 640, 480);
+    depthBuffer.filter(GRAY);
+    depthBuffer.endDraw();
+    
+    updateShaders();
+    
+    depthBuffer.beginDraw();
+    depthBuffer.filter(shader_depth_color);
+    depthBuffer.endDraw();
+  } else {
     rgbImg = moviePlayer[0].movie.get(640, 120, 1280, 600);
-    depthImg = processDepthMap(moviePlayer[0].movie.get(0, 120, 640, 600));
+    //depthImg = processDepthMap(moviePlayer[0].movie.get(0, 120, 640, 600));
+    depthImg = moviePlayer[0].movie.get(0, 120, 640, 600);
     
-    rgbGfx.beginDraw();
-    rgbGfx.image(rgbImg, 0, 0);
-    rgbGfx.endDraw();
+    rgbBuffer.beginDraw();
+    rgbBuffer.image(rgbImg, 0, 0);
+    rgbBuffer.endDraw();
     
-    depthGfx.beginDraw();
-    depthGfx.image(depthImg, 0, 0);
-    depthGfx.endDraw();
+    depthBuffer.beginDraw();
+    depthBuffer.image(depthImg, 0, 0);
+    depthBuffer.endDraw();
     
-    pushMatrix();
-    translate(width/2, height/4);
-    rotate(radians(90));
-    if (debug) {
-      fill(255,0,0);
-      rect(0, 0, 424, 512);
-    } else {
-      image(rgbGfx, 0, 0, 424, 512);
-    }
-    popMatrix();
+    updateShaders();
     
-    pushMatrix();
-    translate(width/2, height/2 + height/4);
-    rotate(radians(90));
-    if (debug) {
-      fill(0,0,255);
-      rect(0, 0, 424, 512);
-    } else {
-      image(depthGfx, 0, 0, 424, 512);
-    }
-    popMatrix();
-    
-    //saveFrame("render/line-######.png");
+    depthBuffer.beginDraw();
+    depthBuffer.filter(shader_depth_color);
+    depthBuffer.endDraw();
+  }
+  
+  rgbGfx.beginDraw();
+  rgbGfx.image(rgbBuffer, 0, 0);
+  rgbGfx.endDraw();
+  
+  depthGfx.beginDraw();
+  depthGfx.image(depthBuffer, 0, 0);
+  depthGfx.endDraw();
+  
+  tex.beginDraw();
+  tex.pushMatrix();
+  tex.translate(width/2, height/4);
+  tex.rotate(radians(90));
+  if (debug) {
+    tex.fill(255,0,0);
+    tex.rect(0, 0, 424, 512);
+  } else {
+    tex.image(rgbGfx, 0, 0, 424, 512);
+  }
+  tex.popMatrix();
+  
+  tex.pushMatrix();
+  tex.translate(width/2, height/2 + height/4);
+  tex.rotate(radians(90));
+  if (debug) {
+    tex.fill(0,0,255);
+    tex.rect(0, 0, 424, 512);
+  } else {
+    tex.image(depthGfx, 0, 0, 424, 512);
+  }
+  tex.popMatrix();
+  tex.endDraw();
+  
+  updateSyphon();
+  image(tex, 0, 0);
+  
+  //saveFrame("render/line-######.png");
 }
 
 void keyPressed() {
   if (key=='d') debug = !debug;
 }
 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
 PImage processDepthMap(PImage _img) {
   _img.loadPixels();
