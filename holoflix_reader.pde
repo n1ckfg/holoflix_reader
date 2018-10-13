@@ -4,7 +4,7 @@ boolean debug = false;
 
 void setup() {
   size(512, 848, P2D);
-  setupMoviePlayer("test.mov");
+  setupMoviePlayer("IHBH2323.MOV");
   depthImg = createImage(640, 480, RGB);
   rgbImg = createImage(640, 480, RGB);
   depthGfx = createGraphics(512, 424, P2D);
