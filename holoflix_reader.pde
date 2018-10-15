@@ -2,11 +2,21 @@ PImage depthImg, rgbImg;
 PGraphics depthBuffer, rgbBuffer; 
 PGraphics depthGfx, rgbGfx;
 boolean debug = false;
-boolean ruttetra = true;
+boolean ruttetra = false;
+boolean renderFrames = true;
+String fileName = "ORMZ9840.MOV";
+String fileNameNoExt = "";
+String filePath = "render";
+String fileType = "tga";
+float fps = 30;
 
 void setup() {
   size(512, 848, P2D);
-  setupMoviePlayer("12876458_568439199999797_1099287423_n.mp4");//"IHBH2323.MOV");
+  frameRate(fps);
+  
+  setupMoviePlayer(fileName);
+  fileNameNoExt = getFileNameNoExt(fileName);
+
   depthImg = createImage(640, 480, RGB);
   depthBuffer = createGraphics(640, 480, P2D);
   rgbBuffer = createGraphics(640, 480, P2D);
@@ -98,12 +108,30 @@ void draw() {
   updateSyphon();
   image(tex, 0, 0);
   
-  //saveFrame("render/line-######.png");
+  if (renderFrames) {
+    if (moviePlayer[0].movie.time() < moviePlayer[0].movie.duration()) {
+      String url = filePath + "/" + fileNameNoExt + "/" + fileNameNoExt + "#####" + "." + fileType;
+      saveFrame(url);
+    } else {
+      renderFrames = false;
+      exit();
+    }
+  }
 }
 
+String getFileNameNoExt(String s) {
+  String returns = "";
+  String[] temp = s.split(".");
+  for (int i=0; i<temp.length-1; i++) {
+    returns += temp[i];
+  }
+  return returns;
+}
+  
 void keyPressed() {
   if (key=='d') debug = !debug;
 }
+
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
